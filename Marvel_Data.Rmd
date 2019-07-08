@@ -40,4 +40,24 @@ top_25<-avengers %>%
 
 top_25
 
+table(top_25$Death1)
+#More than 50% of the top 25 characters have died at least once ~60%
+
+table(top_25$Return1)
+#Of the ones who died once, ~87% returned 
+
+table(top_25$Death2)
+#Of those who have died once, 3 characters died again ~12%
+
+table(top_25$Return2)
+#Of those who have died again, ~66.67% returned
+
+table(top_25$Death3)
+#none of them died again! 2x deaths is a maximum
+
+```
+```{r}
+
+top_25[top_25$Death1=="YES",1]
+
 ```
