@@ -1,0 +1,43 @@
+---
+title: "Marvel Data"
+output: html_document
+---
+
+#Changing directory
+```{r}
+setwd("~/Desktop/Marvel")
+```
+
+#Loading data set
+```{r}
+avengers<-read.csv('avengers.csv')
+avengers<-avengers[,-1]
+head(avengers)
+```
+#Loading required libraries
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+#Explatory
+```{r}
+
+avengers %>% 
+  arrange(desc(Appearances))
+  
+#Most of the characters were male
+#Didn't recognize a lot of the characters because of their full names
+
+```
+
+#Take a look at a top 25
+```{r}
+
+top_25<-avengers %>% 
+          arrange(desc(Appearances)) %>%
+          slice(1:25)
+
+top_25
+
+```
