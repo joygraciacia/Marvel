@@ -56,8 +56,77 @@ table(top_25$Death3)
 #none of them died again! 2x deaths is a maximum
 
 ```
+
 ```{r}
 
-top_25[top_25$Death1=="YES",1]
+score<-rep(NA,nrow(avengers))
+
+for(j in 1:nrow(avengers)){
+  
+    i<-0
+
+  if(avengers$Death1[j] == "YES")
+    i<-i+1
+  
+  if(avengers$Death2[j] == "YES")
+    i<-i+1
+
+  if(avengers$Death3[j] == "YES")
+    i<-i+1
+  
+  if(avengers$Death4[j] == "YES")
+    i<-i+1
+  
+  if(avengers$Death5[j] == "YES")
+    i<-i+1
+  
+  score[j]<-i
+
+}
+
+score<-5-score
+
+```
+```{r}
+
+library(varhandle)
+
+avengers<-cbind(avengers,score)
+data_graph<-avengers[,c(1,21)]
+data_graph$Name.Alias<-unfactor(data_graph$Name.Alias)
+
+data_graph<-data_graph[!data_graph$Name.Alias=="",]
+
+```
+
+```{r}
+data_graph
+data_graph$Name.Alias<-factor(data_graph$Name.Alias)
+```
+```{r}
+p <- ggplot(datat_graph, aes(Name.Alias, score)) + geom_tile(aes(fill = rescale), + colour = "white") + scale_fill_gradient(low = "white", + high = "steelblue")
+```
+
+
+```{r}
+# Create dataset
+data=data.frame(
+  individual=paste( "Mister ", seq(1,60), sep=""),
+  value=sample( seq(10,100), 60, replace=T)
+)
+ 
+# Set a number of 'empty bar'
+empty_bar=10
+ 
+# Add lines to the initial dataset
+to_add = matrix(NA, empty_bar, ncol(data))
+colnames(to_add) = colnames(data)
+data=rbind(data, to_add)
+data$id=seq(1, nrow(data))
+
+```
+
+```{r}
+
 
 ```
