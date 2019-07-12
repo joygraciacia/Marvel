@@ -18,6 +18,7 @@ head(avengers)
 ```{r}
 library(dplyr)
 library(ggplot2)
+library(dplyr)
 ```
 
 #Explatory
@@ -28,6 +29,7 @@ avengers %>%
   
 #Most of the characters were male
 #Didn't recognize a lot of the characters because of their full names
+
 
 ```
 
@@ -55,8 +57,12 @@ table(top_25$Return2)
 table(top_25$Death3)
 #none of them died again! 2x deaths is a maximum
 
-```
+avengers %>% 
+    arrange(desc(Appearances)) %>%
+    slice(1:25)
 
+```
+#Assigning score each time a character dies
 ```{r}
 
 score<-rep(NA,nrow(avengers))
@@ -83,50 +89,181 @@ for(j in 1:nrow(avengers)){
   score[j]<-i
 
 }
-
-score<-5-score
-
+score
+table(score)
 ```
+#Assigning score to when a character is revived
 ```{r}
 
 library(varhandle)
 
 avengers<-cbind(avengers,score)
-data_graph<-avengers[,c(1,21)]
-data_graph$Name.Alias<-unfactor(data_graph$Name.Alias)
-
+data_graph<-avengers[,c(1,2,10:19,21)]
 data_graph<-data_graph[!data_graph$Name.Alias=="",]
 
+
+return<-data_graph[,c(3:12)]
+
+return$Death1<-unfactor(return$Death1)
+return$Death2<-unfactor(return$Death2)
+return$Death3<-unfactor(return$Death3)
+return$Death4<-unfactor(return$Death4)
+return$Death5<-unfactor(return$Death5)
+
+return$Return1<-unfactor(return$Return1)
+return$Return2<-unfactor(return$Return2)
+return$Return3<-unfactor(return$Return3)
+return$Return4<-unfactor(return$Return4)
+return$Return5<-unfactor(return$Return5)
+
+for(i in 1:nrow(return)){
+    if(return$Death1[i]=="YES"){
+      return$Death1[i]<-1
+    }else{
+      return$Death1[i]<-0
+    }
+    
+    if(return$Death2[i]=="YES"){
+      return$Death2[i]<-1
+    }else{
+      return$Death2[i]<-0
+    }
+
+    if(return$Death3[i]=="YES"){
+      return$Death3[i]<-1
+    }else{
+      return$Death3[i]<-0
+    }
+
+    if(return$Death4[i]=="YES"){
+      return$Death4[i]<-1
+    }else{
+      return$Death4[i]<-0
+    }
+
+    if(return$Death5[i]=="YES"){
+      return$Death5[i]<-1
+    }else{
+      return$Death5[i]<-0
+    }
+
+    if(return$Return1[i]=="YES"){
+      return$Return1[i]<-1
+    }else{
+      return$Return1[i]<-0
+    }
+
+    if(return$Return2[i]=="YES"){
+      return$Return2[i]<-1
+    }else{
+      return$Return2[i]<-0
+    }
+
+    if(return$Return3[i]=="YES"){
+      return$Return3[i]<-1
+    }else{
+      return$Return3[i]<-0
+    }
+
+    if(return$Return4[i]=="YES"){
+      return$Return4[i]<-1
+    }else{
+      return$Return4[i]<-0
+    }
+
+    if(return$Return5[i]=="YES"){
+      return$Return5[i]<-1
+    }else{
+      return$Return5[i]<-0
+    }
+}
+
+return$Death1<-as.numeric(return$Death1)
+return$Death2<-as.numeric(return$Death2)
+return$Death3<-as.numeric(return$Death3)
+return$Death4<-as.numeric(return$Death4)
+return$Death5<-as.numeric(return$Death5)
+
+return$Return1<-as.numeric(return$Return1)
+return$Return2<-as.numeric(return$Return2)
+return$Return3<-as.numeric(return$Return3)
+return$Return4<-as.numeric(return$Return4)
+return$Return5<-as.numeric(return$Return5)
+
+colSums(return)
+
+return<-colSums(return)
+
+return$Death1<-69-46
+return$Death2<-16-8
+return$Death3<-1
+return$Death4<-0
+return$Death5<-0
+
+return<-data.frame((unlist(return)))
+
+classifier<-c("Stayed Dead","Revived","Stayed Dead","Revived","Stayed Dead","Revived","Stayed Dead","Revived","Stayed Dead","Revived")
+return<-data.frame(cbind(return,classifier))
+colnames(return)<-c('Count','Classifier')
+
+return$DeathType<-c(rep("Death 1",2),rep("Death 2",2),rep("Death 3",2), rep("Death 4",2), rep("Death 5",2))
+
+library(reshape2)
+
+melt_return<-melt(return)
+melt_return$index<-factor(rownames(return), levels=rownames(return))
+
+melt_return$Classifier<-factor(melt_return$Classifier)
+```
+Visualization 1
+```{r}
+ggplot(melt_return, aes(x=DeathType,y=value)) +
+    geom_col(aes(position="stack", stat="identity", fill=Classifier))+ ggtitle("Revival Rate")
+
+```
+Visualization 2
+```{r}
+data_graph$score<-as.factor(data_graph$score)
+
+table(avengers$Death1=="YES")
+
+table(data_graph$score)
+
+pie<-table(data_graph$Death1=="NO")
+
+pie<-data.frame(matrix(c("Died Atleast Once","Never Died",63,100),nrow=2))
+colnames(pie)<-c("Status","Count")
+
+ggplot(pie, aes(x = "", y = Count, fill = Status)) +
+  geom_bar(width = 1, stat = "identity", color = "white") +
+  coord_polar("y", start = 0)+
+  ggtitle("Proportion of Deaths in the Avengers")+
+  theme_void()
+```
+
+Visualization 3
+```{r}
+library(ggthemes)
+ggplot(data_graph,aes(x=score))+geom_bar(aes(fill=score),position="dodge")+theme_tufte()+ggtitle("Death in the Avengers") +
+  xlab("Times Characters Died") + ylab("Number of Characters")
+```
+
+Visualization 4
+```{r}
+
+ggplot(avengers, aes(x=Death1, y=Appearances)) + geom_boxplot() +ggtitle("Appearance vs Death")
+
+```
+
+Comparing difference in two groups
+```{r}
+
+t.test(Appearances~Death1, data=avengers)
+
 ```
 
 ```{r}
-data_graph
-data_graph$Name.Alias<-factor(data_graph$Name.Alias)
-```
-```{r}
-p <- ggplot(datat_graph, aes(Name.Alias, score)) + geom_tile(aes(fill = rescale), + colour = "white") + scale_fill_gradient(low = "white", + high = "steelblue")
-```
 
-
-```{r}
-# Create dataset
-data=data.frame(
-  individual=paste( "Mister ", seq(1,60), sep=""),
-  value=sample( seq(10,100), 60, replace=T)
-)
- 
-# Set a number of 'empty bar'
-empty_bar=10
- 
-# Add lines to the initial dataset
-to_add = matrix(NA, empty_bar, ncol(data))
-colnames(to_add) = colnames(data)
-data=rbind(data, to_add)
-data$id=seq(1, nrow(data))
-
-```
-
-```{r}
-
+avengers[order(avengers$Appearances, decreasing=TRUE),]
 
 ```
